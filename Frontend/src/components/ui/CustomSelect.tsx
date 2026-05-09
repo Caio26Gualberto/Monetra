@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, forwardRef, memo } from 'react';
+import { useState, useRef, useEffect, forwardRef, memo, useLayoutEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -20,6 +20,7 @@ const CustomSelectComponent = forwardRef<HTMLDivElement, CustomSelectProps>(
     const [isOpen, setIsOpen] = useState(false);
     const [selectedValue, setSelectedValue] = useState(value || '');
     const containerRef = useRef<HTMLDivElement>(null);
+    const selectedItemRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
       if (value !== undefined) {
@@ -41,6 +42,12 @@ const CustomSelectComponent = forwardRef<HTMLDivElement, CustomSelectProps>(
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
       };
+    }, [isOpen]);
+
+    useLayoutEffect(() => {
+      if (isOpen && selectedItemRef.current) {
+        selectedItemRef.current.scrollIntoView({ block: 'nearest' });
+      }
     }, [isOpen]);
 
     const handleSelect = (optionValue: string) => {
@@ -72,25 +79,29 @@ const CustomSelectComponent = forwardRef<HTMLDivElement, CustomSelectProps>(
         </button>
 
         {isOpen && (
-          <div className="absolute z-50 mt-1 w-full rounded-xl border border-white/60 bg-white/95 backdrop-blur-xl shadow-lg overflow-hidden">
-            {options.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => handleSelect(option.value)}
-                className={cn(
-                  'w-full flex items-center justify-between px-4 py-3 text-sm text-left transition-colors',
-                  selectedValue === option.value
-                    ? 'bg-gradient-to-r from-purple-600 to-purple-400 text-white font-medium'
-                    : 'hover:bg-purple-50 text-foreground'
-                )}
-              >
-                <span>{option.label}</span>
-                {selectedValue === option.value && (
-                  <Check className="h-4 w-4" />
-                )}
-              </button>
-            ))}
+          <div className="absolute z-50 mt-1 w-full rounded-xl border border-white/60 bg-white/95 backdrop-blur-xl shadow-lg max-h-72 overflow-y-auto overscroll-contain">
+            {options.map((option) => {
+              const isSelected = selectedValue === option.value;
+              return (
+                <button
+                  key={option.value}
+                  ref={isSelected ? selectedItemRef : undefined}
+                  type="button"
+                  onClick={() => handleSelect(option.value)}
+                  className={cn(
+                    'w-full flex items-center justify-between px-4 py-3 text-sm text-left transition-colors',
+                    isSelected
+                      ? 'bg-gradient-to-r from-purple-600 to-purple-400 text-white font-medium'
+                      : 'hover:bg-purple-50 text-foreground'
+                  )}
+                >
+                  <span>{option.label}</span>
+                  {isSelected && (
+                    <Check className="h-4 w-4" />
+                  )}
+                </button>
+              );
+            })}
           </div>
         )}
       </div>

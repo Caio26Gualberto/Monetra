@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Plus, Pencil, Trash2, CreditCard as CardIcon, CheckCircle2, Loader2, XCircle } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -39,6 +39,12 @@ const purchaseSchema = z.object({
 
 const dayOptions = Array.from({ length: 31 }, (_, i) => ({ value: String(i + 1), label: String(i + 1) }));
 
+const openInvoiceMonth = (closingDay: number, today: Date = new Date()): string => {
+  const ahead = today.getDate() > closingDay ? 1 : 0;
+  const d = new Date(today.getFullYear(), today.getMonth() + ahead, 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+};
+
 export function CreditCardPage() {
   const [month, setMonth] = useState(currentMonth());
   const [cards, setCards] = useState<CreditCard[]>([]);
@@ -54,10 +60,27 @@ export function CreditCardPage() {
   const [deleteCardId, setDeleteCardId] = useState<string | null>(null);
   const [deletePurchaseId, setDeletePurchaseId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const userPickedMonth = useRef(false);
 
   const { success, error: toastError } = useToast();
 
   const selectedCard = useMemo(() => cards.find(c => c.id === selectedCardId), [cards, selectedCardId]);
+
+  useEffect(() => {
+    if (selectedCard && !userPickedMonth.current) {
+      setMonth(openInvoiceMonth(selectedCard.closingDay));
+    }
+  }, [selectedCard]);
+
+  const handleMonthChange = (v: string) => {
+    userPickedMonth.current = true;
+    setMonth(v);
+  };
+
+  const handleCardChange = (id: string) => {
+    userPickedMonth.current = false;
+    setSelectedCardId(id);
+  };
   const cardOptions = useMemo(() => cards.map(c => ({ value: c.id, label: c.cardName })), [cards]);
   const monthOpts = useMemo(() => monthRangeOptions(6, 12), []);
 
@@ -272,14 +295,14 @@ export function CreditCardPage() {
             <div className="w-56">
               <CustomSelect
                 value={selectedCardId}
-                onChange={setSelectedCardId}
+                onChange={handleCardChange}
                 options={cardOptions}
               />
             </div>
             <div className="w-44">
               <CustomSelect
                 value={month}
-                onChange={setMonth}
+                onChange={handleMonthChange}
                 options={monthOpts}
               />
             </div>
