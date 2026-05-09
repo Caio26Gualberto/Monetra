@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, TrendingUp, TrendingDown, CreditCard, Calendar,
-  LineChart, Wallet, LogOut, Sparkles
+  LineChart, Wallet, LogOut, Sparkles, Repeat
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,7 +9,9 @@ import { useAuth } from '@/contexts/AuthContext';
 const items = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/income', label: 'Receitas', icon: TrendingUp },
+  { to: '/fixed-incomes', label: 'Receitas Fixas', icon: Repeat },
   { to: '/expenses', label: 'Despesas', icon: TrendingDown },
+  { to: '/fixed-expenses', label: 'Despesas Fixas', icon: Repeat },
   { to: '/credit-card', label: 'Cartão de Crédito', icon: CreditCard },
   { to: '/monthly-view', label: 'Visão Mensal', icon: Calendar },
   { to: '/projections', label: 'Projeções', icon: LineChart },

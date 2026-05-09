@@ -53,6 +53,20 @@ public interface IFinancialService
     Task<CreditCardSummaryDto> GetCreditCardSummaryAsync(Guid userId, string month, CancellationToken ct = default);
     Task<IEnumerable<CreditCardPurchaseDto>> GetPendingInstallmentsAsync(Guid userId, CancellationToken ct = default);
 
+    // Fixed Expenses
+    Task<FixedExpenseDto> CreateFixedExpenseAsync(Guid userId, CreateFixedExpenseDto dto, CancellationToken ct = default);
+    Task<IEnumerable<FixedExpenseDto>> GetFixedExpensesAsync(Guid userId, CancellationToken ct = default);
+    Task<IEnumerable<FixedExpenseDto>> GetFixedExpensesForMonthAsync(Guid userId, string month, CancellationToken ct = default);
+    Task UpdateFixedExpenseAsync(Guid userId, Guid id, UpdateFixedExpenseDto dto, CancellationToken ct = default);
+    Task DeleteFixedExpenseAsync(Guid userId, Guid id, CancellationToken ct = default);
+
+    // Fixed Incomes
+    Task<FixedIncomeDto> CreateFixedIncomeAsync(Guid userId, CreateFixedIncomeDto dto, CancellationToken ct = default);
+    Task<IEnumerable<FixedIncomeDto>> GetFixedIncomesAsync(Guid userId, CancellationToken ct = default);
+    Task<IEnumerable<FixedIncomeDto>> GetFixedIncomesForMonthAsync(Guid userId, string month, CancellationToken ct = default);
+    Task UpdateFixedIncomeAsync(Guid userId, Guid id, UpdateFixedIncomeDto dto, CancellationToken ct = default);
+    Task DeleteFixedIncomeAsync(Guid userId, Guid id, CancellationToken ct = default);
+
     // Dashboard
     Task<DashboardSummaryDto> GetDashboardSummaryAsync(Guid userId, string? month, CancellationToken ct = default);
     Task<IEnumerable<EvolutionPointDto>> GetEvolutionAsync(Guid userId, int months, CancellationToken ct = default);

@@ -11,7 +11,7 @@ import { DistributionChart } from '@/components/charts/DistributionChart';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { EmptyState } from '@/components/common/EmptyState';
 import { financialService } from '@/services/financial.service';
-import { brl, currentMonth, formatDate, formatMonth, monthOptions } from '@/lib/formatters';
+import { brl, currentMonth, formatDate, formatMonth, monthRangeOptions } from '@/lib/formatters';
 import { extractApiError } from '@/lib/api';
 import { useToast } from '@/contexts/ToastContext';
 import { labelFromCategory } from '@/lib/constants';
@@ -54,7 +54,7 @@ export function DashboardPage() {
             <CustomSelect
               value={month}
               onChange={setMonth}
-              options={monthOptions(12)}
+              options={monthRangeOptions(12, 12)}
             />
           </div>
         }
@@ -66,12 +66,26 @@ export function DashboardPage() {
         <EmptyState title="Sem dados" description="Não foi possível carregar o dashboard." />
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <StatCard title="Saldo em Conta" value={summary.currentBalance} icon={Wallet} gradient="purple" subtitle="Disponível para uso" />
-            <StatCard title="Receitas do Mês" value={summary.monthlyIncome} icon={TrendingUp} comparison={summary.incomeComparison} />
-            <StatCard title="Despesas do Mês" value={summary.monthlyExpense} icon={TrendingDown} comparison={summary.expenseComparison} comparisonInverted />
-            <StatCard title="Projeção" value={summary.projectedBalance} icon={Target} gradient="mix" subtitle="Próximo mês estimado" />
-          </div>
+          {(() => {
+            const today = currentMonth();
+            const isFuture = month > today;
+            const isPast = month < today;
+            const balanceTitle = isFuture ? 'Saldo Estimado' : 'Saldo em Conta';
+            const balanceSubtitle = isFuture
+              ? `Estimativa início de ${formatMonth(month)}`
+              : isPast
+                ? 'Saldo atual (referência)'
+                : 'Disponível para uso';
+            const projectionSubtitle = `Saldo estimado fim de ${formatMonth(month)}`;
+            return (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <StatCard title={balanceTitle} value={summary.currentBalance} icon={Wallet} gradient="purple" subtitle={balanceSubtitle} />
+                <StatCard title="Receitas do Mês" value={summary.monthlyIncome} icon={TrendingUp} comparison={summary.incomeComparison} />
+                <StatCard title="Despesas do Mês" value={summary.monthlyExpense} icon={TrendingDown} comparison={summary.expenseComparison} comparisonInverted />
+                <StatCard title="Projeção" value={summary.projectedBalance} icon={Target} gradient="mix" subtitle={projectionSubtitle} />
+              </div>
+            );
+          })()}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
             <Card className="lg:col-span-2">

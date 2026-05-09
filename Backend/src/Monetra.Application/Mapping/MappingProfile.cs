@@ -32,5 +32,12 @@ public class MappingProfile : Profile
                 o => o.MapFrom(s => s.GetInstallmentValue()))
             .ForCtorParam(nameof(CreditCardPurchaseDto.FirstInvoiceMonth),
                 o => o.MapFrom<string>(s => string.Empty));
+
+        CreateMap<Domain.Entities.FixedExpense, FixedExpenseDto>()
+            .ForCtorParam(nameof(FixedExpenseDto.Category), o => o.MapFrom(s => s.Category.ToString()))
+            .ForCtorParam(nameof(FixedExpenseDto.PaymentMethod), o => o.MapFrom(s => s.PaymentMethod.ToString()));
+
+        CreateMap<Domain.Entities.FixedIncome, FixedIncomeDto>()
+            .ForCtorParam(nameof(FixedIncomeDto.Type), o => o.MapFrom(s => s.Type.ToString()));
     }
 }

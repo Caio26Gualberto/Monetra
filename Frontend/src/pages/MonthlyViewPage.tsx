@@ -9,7 +9,7 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { financialService } from '@/services/financial.service';
 import { extractApiError } from '@/lib/api';
 import { useToast } from '@/contexts/ToastContext';
-import { brl, currentMonth, formatDate, formatMonth, monthOptions } from '@/lib/formatters';
+import { brl, currentMonth, formatDate, formatMonth, monthRangeOptions } from '@/lib/formatters';
 import { expenseCategoryLabels, expenseCategoryList, labelFromCategory } from '@/lib/constants';
 import type { ExpenseCategory, MonthlyOverview, Transaction } from '@/lib/types';
 
@@ -48,7 +48,7 @@ export function MonthlyViewPage() {
       <PageTitle title="Visão Mensal" subtitle={formatMonth(month)} />
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
-        <CustomSelect value={month} onChange={setMonth} options={monthOptions(12)} />
+        <CustomSelect value={month} onChange={setMonth} options={monthRangeOptions(12, 12)} />
         <CustomSelect
           value={type}
           onChange={(v) => setType(v as typeof type)}

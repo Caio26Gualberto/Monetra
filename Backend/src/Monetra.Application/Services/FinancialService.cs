@@ -19,6 +19,8 @@ public partial class FinancialService : IFinancialService
     private readonly ICreditCardRepository _cards;
     private readonly ICreditCardPurchaseRepository _purchases;
     private readonly ICreditCardInvoicePaymentRepository _invoicePayments;
+    private readonly IFixedExpenseRepository _fixedExpenses;
+    private readonly IFixedIncomeRepository _fixedIncomes;
     private readonly IMapper _mapper;
 
     public FinancialService(
@@ -28,6 +30,8 @@ public partial class FinancialService : IFinancialService
         ICreditCardRepository cards,
         ICreditCardPurchaseRepository purchases,
         ICreditCardInvoicePaymentRepository invoicePayments,
+        IFixedExpenseRepository fixedExpenses,
+        IFixedIncomeRepository fixedIncomes,
         IMapper mapper)
     {
         _accounts = accounts;
@@ -36,6 +40,8 @@ public partial class FinancialService : IFinancialService
         _cards = cards;
         _purchases = purchases;
         _invoicePayments = invoicePayments;
+        _fixedExpenses = fixedExpenses;
+        _fixedIncomes = fixedIncomes;
         _mapper = mapper;
     }
 

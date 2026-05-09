@@ -3,8 +3,10 @@ import type {
   Account, AccountBalanceHistory,
   CategoryDistribution, CategoryTotal, CreditCard, CreditCardInvoice, CreditCardPurchase,
   CreditCardSummary, DashboardSummary, EvolutionPoint, Expense, ExpenseSummary,
+  FixedExpense, FixedIncome,
   Income, IncomeSummary, MonthlyOverview, Projection, ProjectionAnalysis, Transaction,
-  CreateIncomeRequest, CreateExpenseRequest, CreateCreditCardRequest, CreatePurchaseRequest
+  CreateIncomeRequest, CreateExpenseRequest, CreateCreditCardRequest, CreatePurchaseRequest,
+  CreateFixedExpenseRequest, CreateFixedIncomeRequest
 } from '@/lib/types';
 
 export const financialService = {
@@ -40,6 +42,30 @@ export const financialService = {
     apiClient.get<ExpenseSummary>(`/api/financial/expense/summary/${month}`).then(r => r.data),
   getExpenseByCategory: (month: string) =>
     apiClient.get<CategoryTotal[]>(`/api/financial/expense/by-category/${month}`).then(r => r.data),
+
+  // Fixed Expense
+  getFixedExpenses: () =>
+    apiClient.get<FixedExpense[]>('/api/financial/fixed-expense').then(r => r.data),
+  getFixedExpensesForMonth: (month: string) =>
+    apiClient.get<FixedExpense[]>(`/api/financial/fixed-expense/month/${month}`).then(r => r.data),
+  createFixedExpense: (data: CreateFixedExpenseRequest) =>
+    apiClient.post<FixedExpense>('/api/financial/fixed-expense', data).then(r => r.data),
+  updateFixedExpense: (id: string, data: CreateFixedExpenseRequest) =>
+    apiClient.put(`/api/financial/fixed-expense/${id}`, data),
+  deleteFixedExpense: (id: string) =>
+    apiClient.delete(`/api/financial/fixed-expense/${id}`),
+
+  // Fixed Income
+  getFixedIncomes: () =>
+    apiClient.get<FixedIncome[]>('/api/financial/fixed-income').then(r => r.data),
+  getFixedIncomesForMonth: (month: string) =>
+    apiClient.get<FixedIncome[]>(`/api/financial/fixed-income/month/${month}`).then(r => r.data),
+  createFixedIncome: (data: CreateFixedIncomeRequest) =>
+    apiClient.post<FixedIncome>('/api/financial/fixed-income', data).then(r => r.data),
+  updateFixedIncome: (id: string, data: CreateFixedIncomeRequest) =>
+    apiClient.put(`/api/financial/fixed-income/${id}`, data),
+  deleteFixedIncome: (id: string) =>
+    apiClient.delete(`/api/financial/fixed-income/${id}`),
 
   // Credit Card
   getCreditCards: () => apiClient.get<CreditCard[]>('/api/financial/creditcard').then(r => r.data),

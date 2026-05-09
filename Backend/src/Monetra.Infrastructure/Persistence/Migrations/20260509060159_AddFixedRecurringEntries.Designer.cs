@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Monetra.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace Monetra.Infrastructure.Migrations
+namespace Monetra.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(MonetraDbContext))]
-    partial class MonetraDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260509060159_AddFixedRecurringEntries")]
+    partial class AddFixedRecurringEntries
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

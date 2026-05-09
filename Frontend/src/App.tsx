@@ -5,7 +5,9 @@ import { LoginPage } from '@/pages/auth/LoginPage';
 import { RegisterPage } from '@/pages/auth/RegisterPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { IncomePage } from '@/pages/IncomePage';
+import { FixedIncomesPage } from '@/pages/FixedIncomesPage';
 import { ExpensesPage } from '@/pages/ExpensesPage';
+import { FixedExpensesPage } from '@/pages/FixedExpensesPage';
 import { CreditCardPage } from '@/pages/CreditCardPage';
 import { MonthlyViewPage } from '@/pages/MonthlyViewPage';
 import { ProjectionsPage } from '@/pages/ProjectionsPage';
@@ -21,7 +23,9 @@ export function App() {
       <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/income" element={<IncomePage />} />
+        <Route path="/fixed-incomes" element={<FixedIncomesPage />} />
         <Route path="/expenses" element={<ExpensesPage />} />
+        <Route path="/fixed-expenses" element={<FixedExpensesPage />} />
         <Route path="/credit-card" element={<CreditCardPage />} />
         <Route path="/monthly-view" element={<MonthlyViewPage />} />
         <Route path="/projections" element={<ProjectionsPage />} />

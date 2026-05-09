@@ -15,6 +15,8 @@ public class MonetraDbContext : DbContext
     public DbSet<CreditCard> CreditCards => Set<CreditCard>();
     public DbSet<CreditCardPurchase> CreditCardPurchases => Set<CreditCardPurchase>();
     public DbSet<CreditCardInvoicePayment> CreditCardInvoicePayments => Set<CreditCardInvoicePayment>();
+    public DbSet<FixedExpense> FixedExpenses => Set<FixedExpense>();
+    public DbSet<FixedIncome> FixedIncomes => Set<FixedIncome>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder b)
@@ -100,6 +102,29 @@ public class MonetraDbContext : DbContext
             e.Property(x => x.Month).IsRequired().HasMaxLength(7);
             e.HasIndex(x => new { x.CreditCardId, x.Month }).IsUnique();
             e.HasOne<CreditCard>().WithMany().HasForeignKey(x => x.CreditCardId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        b.Entity<FixedExpense>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => x.UserId);
+            e.Property(x => x.Description).IsRequired().HasMaxLength(255);
+            e.Property(x => x.Amount).HasColumnType("decimal(18,2)");
+            e.Property(x => x.Category).HasConversion<int>();
+            e.Property(x => x.PaymentMethod).HasConversion<int>();
+            e.Property(x => x.StartMonth).IsRequired().HasMaxLength(7);
+            e.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        b.Entity<FixedIncome>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => x.UserId);
+            e.Property(x => x.Description).IsRequired().HasMaxLength(255);
+            e.Property(x => x.Amount).HasColumnType("decimal(18,2)");
+            e.Property(x => x.Type).HasConversion<int>();
+            e.Property(x => x.StartMonth).IsRequired().HasMaxLength(7);
+            e.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
         });
 
         b.Entity<RefreshToken>(e =>

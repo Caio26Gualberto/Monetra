@@ -105,3 +105,49 @@ public class UpdatePurchaseDtoValidator : AbstractValidator<UpdatePurchaseDto>
             .WithMessage("CurrentInstallment must be less than or equal to TotalInstallments.");
     }
 }
+
+public class CreateFixedExpenseDtoValidator : AbstractValidator<CreateFixedExpenseDto>
+{
+    public CreateFixedExpenseDtoValidator()
+    {
+        RuleFor(x => x.Description).NotEmpty().MaximumLength(255);
+        RuleFor(x => x.Amount).GreaterThan(0);
+        RuleFor(x => x.Category).NotEmpty();
+        RuleFor(x => x.PaymentMethod).NotEmpty();
+        RuleFor(x => x.StartMonth).NotEmpty().Matches("^\\d{4}-(0[1-9]|1[0-2])$");
+    }
+}
+
+public class UpdateFixedExpenseDtoValidator : AbstractValidator<UpdateFixedExpenseDto>
+{
+    public UpdateFixedExpenseDtoValidator()
+    {
+        RuleFor(x => x.Description).NotEmpty().MaximumLength(255);
+        RuleFor(x => x.Amount).GreaterThan(0);
+        RuleFor(x => x.Category).NotEmpty();
+        RuleFor(x => x.PaymentMethod).NotEmpty();
+        RuleFor(x => x.StartMonth).NotEmpty().Matches("^\\d{4}-(0[1-9]|1[0-2])$");
+    }
+}
+
+public class CreateFixedIncomeDtoValidator : AbstractValidator<CreateFixedIncomeDto>
+{
+    public CreateFixedIncomeDtoValidator()
+    {
+        RuleFor(x => x.Description).NotEmpty().MaximumLength(255);
+        RuleFor(x => x.Amount).GreaterThan(0);
+        RuleFor(x => x.Type).NotEmpty();
+        RuleFor(x => x.StartMonth).NotEmpty().Matches("^\\d{4}-(0[1-9]|1[0-2])$");
+    }
+}
+
+public class UpdateFixedIncomeDtoValidator : AbstractValidator<UpdateFixedIncomeDto>
+{
+    public UpdateFixedIncomeDtoValidator()
+    {
+        RuleFor(x => x.Description).NotEmpty().MaximumLength(255);
+        RuleFor(x => x.Amount).GreaterThan(0);
+        RuleFor(x => x.Type).NotEmpty();
+        RuleFor(x => x.StartMonth).NotEmpty().Matches("^\\d{4}-(0[1-9]|1[0-2])$");
+    }
+}

@@ -101,6 +101,38 @@ export interface ExpenseSummary {
   byCategory: CategoryTotal[];
 }
 
+export interface FixedExpense {
+  id: string;
+  description: string;
+  amount: number;
+  category: ExpenseCategory;
+  paymentMethod: PaymentMethod;
+  startMonth: string;
+}
+
+export interface CreateFixedExpenseRequest {
+  description: string;
+  amount: number;
+  category: ExpenseCategory;
+  paymentMethod: PaymentMethod;
+  startMonth: string;
+}
+
+export interface FixedIncome {
+  id: string;
+  description: string;
+  amount: number;
+  type: IncomeType;
+  startMonth: string;
+}
+
+export interface CreateFixedIncomeRequest {
+  description: string;
+  amount: number;
+  type: IncomeType;
+  startMonth: string;
+}
+
 export interface CreditCard {
   id: string;
   cardName: string;
