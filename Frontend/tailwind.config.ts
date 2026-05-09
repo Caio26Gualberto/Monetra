@@ -53,11 +53,21 @@ const config: Config = {
         'slide-in': {
           '0%': { opacity: '0', transform: 'translateX(-20px)' },
           '100%': { opacity: '1', transform: 'translateX(0)' }
+        },
+        'overlay-in': {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' }
+        },
+        'dialog-in': {
+          '0%': { opacity: '0', transform: 'translate(-50%, -48%) scale(0.96)' },
+          '100%': { opacity: '1', transform: 'translate(-50%, -50%) scale(1)' }
         }
       },
       animation: {
         'fade-in': 'fade-in 0.3s ease-out',
-        'slide-in': 'slide-in 0.3s ease-out'
+        'slide-in': 'slide-in 0.3s ease-out',
+        'overlay-in': 'overlay-in 0.2s ease-out',
+        'dialog-in': 'dialog-in 0.22s ease-out'
       }
     }
   },
