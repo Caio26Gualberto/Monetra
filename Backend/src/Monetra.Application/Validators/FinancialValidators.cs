@@ -64,9 +64,8 @@ public class CreateCreditCardDtoValidator : AbstractValidator<CreateCreditCardDt
     public CreateCreditCardDtoValidator()
     {
         RuleFor(x => x.CardName).NotEmpty().MaximumLength(80);
-        RuleFor(x => x.TotalAmount).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.DueDate).NotEmpty();
-        RuleFor(x => x.Month).Matches(@"^\d{4}-\d{2}$");
+        RuleFor(x => x.ClosingDay).InclusiveBetween(1, 31);
+        RuleFor(x => x.DueDay).InclusiveBetween(1, 31);
     }
 }
 
@@ -75,8 +74,8 @@ public class UpdateCreditCardDtoValidator : AbstractValidator<UpdateCreditCardDt
     public UpdateCreditCardDtoValidator()
     {
         RuleFor(x => x.CardName).NotEmpty().MaximumLength(80);
-        RuleFor(x => x.TotalAmount).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.Month).Matches(@"^\d{4}-\d{2}$");
+        RuleFor(x => x.ClosingDay).InclusiveBetween(1, 31);
+        RuleFor(x => x.DueDay).InclusiveBetween(1, 31);
     }
 }
 
@@ -87,6 +86,9 @@ public class CreatePurchaseDtoValidator : AbstractValidator<CreatePurchaseDto>
         RuleFor(x => x.Description).NotEmpty().MaximumLength(255);
         RuleFor(x => x.Amount).GreaterThan(0);
         RuleFor(x => x.TotalInstallments).InclusiveBetween(1, 24);
+        RuleFor(x => x.CurrentInstallment).GreaterThanOrEqualTo(1);
+        RuleFor(x => x).Must(d => d.CurrentInstallment <= d.TotalInstallments)
+            .WithMessage("CurrentInstallment must be less than or equal to TotalInstallments.");
         RuleFor(x => x.PurchaseDate).NotEmpty();
     }
 }
@@ -98,5 +100,8 @@ public class UpdatePurchaseDtoValidator : AbstractValidator<UpdatePurchaseDto>
         RuleFor(x => x.Description).NotEmpty().MaximumLength(255);
         RuleFor(x => x.Amount).GreaterThan(0);
         RuleFor(x => x.TotalInstallments).InclusiveBetween(1, 24);
+        RuleFor(x => x.CurrentInstallment).GreaterThanOrEqualTo(1);
+        RuleFor(x => x).Must(d => d.CurrentInstallment <= d.TotalInstallments)
+            .WithMessage("CurrentInstallment must be less than or equal to TotalInstallments.");
     }
 }

@@ -7,41 +7,24 @@ public class CreditCard : Entity
 {
     public Guid UserId { get; private set; }
     public string CardName { get; private set; } = string.Empty;
-    public decimal TotalAmount { get; private set; }
-    public DateTime DueDate { get; private set; }
-    public string Month { get; private set; } = string.Empty; // yyyy-MM
-    public bool IsPaid { get; private set; }
+    public int ClosingDay { get; private set; }
+    public int DueDay { get; private set; }
 
     private CreditCard() { }
 
-    public CreditCard(Guid userId, string cardName, decimal totalAmount, DateTime dueDate, string month)
+    public CreditCard(Guid userId, string cardName, int closingDay, int dueDay)
     {
         UserId = userId;
         SetCardName(cardName);
-        SetTotalAmount(totalAmount);
-        DueDate = dueDate;
-        SetMonth(month);
-        IsPaid = false;
+        SetClosingDay(closingDay);
+        SetDueDay(dueDay);
     }
 
-    public void Update(string cardName, decimal totalAmount, DateTime dueDate, string month)
+    public void Update(string cardName, int closingDay, int dueDay)
     {
         SetCardName(cardName);
-        SetTotalAmount(totalAmount);
-        DueDate = dueDate;
-        SetMonth(month);
-        Touch();
-    }
-
-    public void MarkAsPaid()
-    {
-        IsPaid = true;
-        Touch();
-    }
-
-    public void MarkAsUnpaid()
-    {
-        IsPaid = false;
+        SetClosingDay(closingDay);
+        SetDueDay(dueDay);
         Touch();
     }
 
@@ -52,17 +35,17 @@ public class CreditCard : Entity
         CardName = cardName.Trim();
     }
 
-    private void SetTotalAmount(decimal totalAmount)
+    private void SetClosingDay(int closingDay)
     {
-        if (totalAmount < 0)
-            throw new DomainException("Total amount cannot be negative.");
-        TotalAmount = totalAmount;
+        if (closingDay < 1 || closingDay > 31)
+            throw new DomainException("Closing day must be between 1 and 31.");
+        ClosingDay = closingDay;
     }
 
-    private void SetMonth(string month)
+    private void SetDueDay(int dueDay)
     {
-        if (string.IsNullOrWhiteSpace(month) || !System.Text.RegularExpressions.Regex.IsMatch(month, @"^\d{4}-\d{2}$"))
-            throw new DomainException("Month must be in yyyy-MM format.");
-        Month = month;
+        if (dueDay < 1 || dueDay > 31)
+            throw new DomainException("Due day must be between 1 and 31.");
+        DueDay = dueDay;
     }
 }

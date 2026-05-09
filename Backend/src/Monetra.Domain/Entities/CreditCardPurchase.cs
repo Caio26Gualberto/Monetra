@@ -14,34 +14,22 @@ public class CreditCardPurchase : Entity
 
     private CreditCardPurchase() { }
 
-    public CreditCardPurchase(Guid creditCardId, string description, decimal amount, int totalInstallments, DateTime purchaseDate)
+    public CreditCardPurchase(Guid creditCardId, string description, decimal amount, int totalInstallments, int currentInstallment, DateTime purchaseDate)
     {
         CreditCardId = creditCardId;
         SetDescription(description);
         SetAmount(amount);
-        SetInstallments(totalInstallments);
+        SetInstallments(totalInstallments, currentInstallment);
         PurchaseDate = purchaseDate;
-        CurrentInstallment = 1;
     }
 
-    public void Update(string description, decimal amount, int totalInstallments, DateTime purchaseDate)
+    public void Update(string description, decimal amount, int totalInstallments, int currentInstallment, DateTime purchaseDate)
     {
-        if (!CanEdit())
-            throw new DomainException("Past purchases cannot be edited.");
         SetDescription(description);
         SetAmount(amount);
-        SetInstallments(totalInstallments);
+        SetInstallments(totalInstallments, currentInstallment);
         PurchaseDate = purchaseDate;
         Touch();
-    }
-
-    public void AdvanceInstallment()
-    {
-        if (CurrentInstallment < TotalInstallments)
-        {
-            CurrentInstallment++;
-            Touch();
-        }
     }
 
     public decimal GetInstallmentValue() =>
@@ -64,13 +52,15 @@ public class CreditCardPurchase : Entity
         Amount = amount;
     }
 
-    private void SetInstallments(int totalInstallments)
+    private void SetInstallments(int totalInstallments, int currentInstallment)
     {
         if (totalInstallments < 1 || totalInstallments > 24)
             throw new DomainException("Installments must be between 1 and 24.");
+        if (currentInstallment < 1 || currentInstallment > totalInstallments)
+            throw new DomainException("Current installment must be between 1 and total installments.");
         TotalInstallments = totalInstallments;
+        CurrentInstallment = currentInstallment;
     }
 
-    public bool CanEdit() => PurchaseDate.Date >= DateTime.UtcNow.Date;
     public bool CanDelete() => true;
 }

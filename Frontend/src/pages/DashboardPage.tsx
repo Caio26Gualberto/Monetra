@@ -3,7 +3,7 @@ import { Wallet, TrendingUp, TrendingDown, Target, ArrowRight } from 'lucide-rea
 import { Link } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
-import { Select } from '@/components/ui/Select';
+import { CustomSelect } from '@/components/ui/CustomSelect';
 import { Button } from '@/components/ui/Button';
 import { StatCard } from '@/components/cards/StatCard';
 import { EvolutionChart } from '@/components/charts/EvolutionChart';
@@ -50,9 +50,13 @@ export function DashboardPage() {
         title="Dashboard"
         subtitle={`Visão geral · ${formatMonth(month)}`}
         action={
-          <Select value={month} onChange={(e) => setMonth(e.target.value)} className="w-44">
-            {monthOptions(12).map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </Select>
+          <div className="w-44">
+            <CustomSelect
+              value={month}
+              onChange={setMonth}
+              options={monthOptions(12)}
+            />
+          </div>
         }
       />
 

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Search, ChevronDown, ChevronRight } from 'lucide-react';
 import { Header, PageTitle } from '@/components/layout/Header';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
-import { Select } from '@/components/ui/Select';
+import { CustomSelect } from '@/components/ui/CustomSelect';
 import { Input } from '@/components/ui/Input';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -48,25 +48,35 @@ export function MonthlyViewPage() {
       <PageTitle title="Visão Mensal" subtitle={formatMonth(month)} />
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
-        <Select value={month} onChange={(e) => setMonth(e.target.value)}>
-          {monthOptions(12).map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </Select>
-        <Select value={type} onChange={(e) => setType(e.target.value as typeof type)}>
-          <option value="All">Receitas e Despesas</option>
-          <option value="Income">Receitas</option>
-          <option value="Expense">Despesas</option>
-        </Select>
-        <Select value={category} onChange={(e) => setCategory(e.target.value as 'All' | ExpenseCategory)}>
-          <option value="All">Todas categorias</option>
-          {expenseCategoryList.map(c => <option key={c} value={c}>{expenseCategoryLabels[c]}</option>)}
-        </Select>
-        <Select value={sort} onChange={(e) => setSort(e.target.value)}>
-          <option value="date_desc">Data ↓</option>
-          <option value="date_asc">Data ↑</option>
-          <option value="amount_desc">Valor ↓</option>
-          <option value="amount_asc">Valor ↑</option>
-          <option value="category">Categoria</option>
-        </Select>
+        <CustomSelect value={month} onChange={setMonth} options={monthOptions(12)} />
+        <CustomSelect
+          value={type}
+          onChange={(v) => setType(v as typeof type)}
+          options={[
+            { value: 'All', label: 'Receitas e Despesas' },
+            { value: 'Income', label: 'Receitas' },
+            { value: 'Expense', label: 'Despesas' }
+          ]}
+        />
+        <CustomSelect
+          value={category}
+          onChange={(v) => setCategory(v as 'All' | ExpenseCategory)}
+          options={[
+            { value: 'All', label: 'Todas categorias' },
+            ...expenseCategoryList.map(c => ({ value: c, label: expenseCategoryLabels[c] }))
+          ]}
+        />
+        <CustomSelect
+          value={sort}
+          onChange={setSort}
+          options={[
+            { value: 'date_desc', label: 'Data ↓' },
+            { value: 'date_asc', label: 'Data ↑' },
+            { value: 'amount_desc', label: 'Valor ↓' },
+            { value: 'amount_asc', label: 'Valor ↑' },
+            { value: 'category', label: 'Categoria' }
+          ]}
+        />
         <div className="relative col-span-2 lg:col-span-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input className="pl-10" placeholder="Buscar..." value={search} onChange={(e) => setSearch(e.target.value)} />

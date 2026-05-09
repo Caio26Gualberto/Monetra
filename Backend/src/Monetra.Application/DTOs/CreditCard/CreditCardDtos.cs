@@ -3,24 +3,20 @@ namespace Monetra.Application.DTOs.CreditCard;
 public record CreditCardDto(
     Guid Id,
     string CardName,
-    decimal TotalAmount,
-    DateTime DueDate,
-    string Month,
-    bool IsPaid
+    int ClosingDay,
+    int DueDay
 );
 
 public record CreateCreditCardDto(
     string CardName,
-    decimal TotalAmount,
-    DateTime DueDate,
-    string Month
+    int ClosingDay,
+    int DueDay
 );
 
 public record UpdateCreditCardDto(
     string CardName,
-    decimal TotalAmount,
-    DateTime DueDate,
-    string Month
+    int ClosingDay,
+    int DueDay
 );
 
 public record CreditCardPurchaseDto(
@@ -31,13 +27,15 @@ public record CreditCardPurchaseDto(
     int TotalInstallments,
     int CurrentInstallment,
     decimal InstallmentValue,
-    DateTime PurchaseDate
+    DateTime PurchaseDate,
+    string FirstInvoiceMonth
 );
 
 public record CreatePurchaseDto(
     string Description,
     decimal Amount,
     int TotalInstallments,
+    int CurrentInstallment,
     DateTime PurchaseDate
 );
 
@@ -45,7 +43,27 @@ public record UpdatePurchaseDto(
     string Description,
     decimal Amount,
     int TotalInstallments,
+    int CurrentInstallment,
     DateTime PurchaseDate
+);
+
+public record InvoiceLineDto(
+    Guid PurchaseId,
+    string Description,
+    int InstallmentNumber,
+    int TotalInstallments,
+    decimal InstallmentValue,
+    DateTime PurchaseDate
+);
+
+public record CreditCardInvoiceDto(
+    Guid CreditCardId,
+    string CardName,
+    string Month,
+    DateTime DueDate,
+    decimal TotalAmount,
+    bool IsPaid,
+    IReadOnlyList<InvoiceLineDto> Lines
 );
 
 public record CreditCardSummaryDto(

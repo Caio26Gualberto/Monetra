@@ -14,6 +14,7 @@ public class MonetraDbContext : DbContext
     public DbSet<Expense> Expenses => Set<Expense>();
     public DbSet<CreditCard> CreditCards => Set<CreditCard>();
     public DbSet<CreditCardPurchase> CreditCardPurchases => Set<CreditCardPurchase>();
+    public DbSet<CreditCardInvoicePayment> CreditCardInvoicePayments => Set<CreditCardInvoicePayment>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder b)
@@ -76,10 +77,9 @@ public class MonetraDbContext : DbContext
         {
             e.HasKey(x => x.Id);
             e.HasIndex(x => x.UserId);
-            e.HasIndex(x => x.Month);
             e.Property(x => x.CardName).IsRequired().HasMaxLength(80);
-            e.Property(x => x.TotalAmount).HasColumnType("decimal(18,2)");
-            e.Property(x => x.Month).IsRequired().HasMaxLength(7);
+            e.Property(x => x.ClosingDay).IsRequired();
+            e.Property(x => x.DueDay).IsRequired();
             e.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -90,6 +90,14 @@ public class MonetraDbContext : DbContext
             e.HasIndex(x => x.PurchaseDate);
             e.Property(x => x.Description).IsRequired().HasMaxLength(255);
             e.Property(x => x.Amount).HasColumnType("decimal(18,2)");
+            e.HasOne<CreditCard>().WithMany().HasForeignKey(x => x.CreditCardId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        b.Entity<CreditCardInvoicePayment>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Month).IsRequired().HasMaxLength(7);
+            e.HasIndex(x => new { x.CreditCardId, x.Month }).IsUnique();
             e.HasOne<CreditCard>().WithMany().HasForeignKey(x => x.CreditCardId).OnDelete(DeleteBehavior.Cascade);
         });
 

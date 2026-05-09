@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Wallet, RefreshCw, Loader2 } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Header, PageTitle } from '@/components/layout/Header';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { CurrencyInput } from '@/components/ui/CurrencyInput';
 import { Label } from '@/components/ui/Label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
@@ -30,7 +31,7 @@ export function AccountBalancePage() {
   const [submitting, setSubmitting] = useState(false);
   const { success, error: toastError } = useToast();
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<z.infer<typeof schema>>({
+  const { register, handleSubmit, reset, control, formState: { errors } } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: { newBalance: 0, notes: '' }
   });
@@ -125,7 +126,15 @@ export function AccountBalancePage() {
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
             <div>
               <Label>Novo Saldo (R$)</Label>
-              <Input type="number" step="0.01" min="0" className="mt-1" {...register('newBalance')} />
+              <div className="mt-1">
+                <Controller
+                  control={control}
+                  name="newBalance"
+                  render={({ field }) => (
+                    <CurrencyInput value={field.value} onChange={field.onChange} />
+                  )}
+                />
+              </div>
               {errors.newBalance && <span className="text-xs text-rose-600">{errors.newBalance.message}</span>}
             </div>
             <div>

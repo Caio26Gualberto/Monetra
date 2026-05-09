@@ -3,7 +3,6 @@ import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { Header, PageTitle } from '@/components/layout/Header';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Select } from '@/components/ui/Select';
 import { CustomSelect } from '@/components/ui/CustomSelect';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';

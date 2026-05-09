@@ -10,10 +10,6 @@ public class CreditCardRepository : Repository<CreditCard>, ICreditCardRepositor
 
     public async Task<IEnumerable<CreditCard>> GetByUserIdAsync(Guid userId, CancellationToken ct = default)
         => await Db.CreditCards.Where(c => c.UserId == userId).OrderBy(c => c.CardName).ToListAsync(ct);
-
-    public async Task<IEnumerable<CreditCard>> GetByMonthAsync(Guid userId, string month, CancellationToken ct = default)
-        => await Db.CreditCards.Where(c => c.UserId == userId && c.Month == month)
-            .OrderBy(c => c.CardName).ToListAsync(ct);
 }
 
 public class CreditCardPurchaseRepository : Repository<CreditCardPurchase>, ICreditCardPurchaseRepository
@@ -24,13 +20,14 @@ public class CreditCardPurchaseRepository : Repository<CreditCardPurchase>, ICre
         => await Db.CreditCardPurchases.Where(p => p.CreditCardId == creditCardId)
             .OrderByDescending(p => p.PurchaseDate).ToListAsync(ct);
 
-    public async Task<IEnumerable<CreditCardPurchase>> GetByCreditCardAndMonthAsync(Guid creditCardId, string month, CancellationToken ct = default)
+    public async Task<IEnumerable<CreditCardPurchase>> GetByUserIdAsync(Guid userId, CancellationToken ct = default)
     {
-        var (s, e) = MonthRange(month);
-        return await Db.CreditCardPurchases
-            .Where(p => p.CreditCardId == creditCardId && p.PurchaseDate >= s && p.PurchaseDate < e)
-            .OrderByDescending(p => p.PurchaseDate)
-            .ToListAsync(ct);
+        var query = from p in Db.CreditCardPurchases
+                    join c in Db.CreditCards on p.CreditCardId equals c.Id
+                    where c.UserId == userId
+                    orderby p.PurchaseDate descending
+                    select p;
+        return await query.ToListAsync(ct);
     }
 
     public async Task<IEnumerable<CreditCardPurchase>> GetPendingInstallmentsByUserAsync(Guid userId, CancellationToken ct = default)
@@ -42,11 +39,35 @@ public class CreditCardPurchaseRepository : Repository<CreditCardPurchase>, ICre
                     select p;
         return await query.ToListAsync(ct);
     }
+}
 
-    private static (DateTime start, DateTime end) MonthRange(string month)
+public class CreditCardInvoicePaymentRepository : Repository<CreditCardInvoicePayment>, ICreditCardInvoicePaymentRepository
+{
+    public CreditCardInvoicePaymentRepository(MonetraDbContext db) : base(db) { }
+
+    public async Task<CreditCardInvoicePayment?> GetAsync(Guid creditCardId, string month, CancellationToken ct = default)
+        => await Db.CreditCardInvoicePayments
+            .FirstOrDefaultAsync(p => p.CreditCardId == creditCardId && p.Month == month, ct);
+
+    public async Task<IEnumerable<CreditCardInvoicePayment>> GetByCardAsync(Guid creditCardId, CancellationToken ct = default)
+        => await Db.CreditCardInvoicePayments.Where(p => p.CreditCardId == creditCardId)
+            .OrderByDescending(p => p.Month).ToListAsync(ct);
+
+    public async Task<IEnumerable<CreditCardInvoicePayment>> GetByUserAsync(Guid userId, CancellationToken ct = default)
     {
-        var dt = DateTime.ParseExact(month, "yyyy-MM", System.Globalization.CultureInfo.InvariantCulture);
-        var start = new DateTime(dt.Year, dt.Month, 1, 0, 0, 0, DateTimeKind.Utc);
-        return (start, start.AddMonths(1));
+        var q = from p in Db.CreditCardInvoicePayments
+                join c in Db.CreditCards on p.CreditCardId equals c.Id
+                where c.UserId == userId
+                orderby p.Month descending
+                select p;
+        return await q.ToListAsync(ct);
+    }
+
+    public async Task DeleteAsync(Guid creditCardId, string month, CancellationToken ct = default)
+    {
+        var entity = await GetAsync(creditCardId, month, ct);
+        if (entity == null) return;
+        Db.CreditCardInvoicePayments.Remove(entity);
+        await Db.SaveChangesAsync(ct);
     }
 }

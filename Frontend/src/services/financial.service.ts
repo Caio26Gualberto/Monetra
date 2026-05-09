@@ -1,7 +1,7 @@
 import { apiClient } from '@/lib/api';
 import type {
   Account, AccountBalanceHistory,
-  CategoryDistribution, CategoryTotal, CreditCard, CreditCardPurchase,
+  CategoryDistribution, CategoryTotal, CreditCard, CreditCardInvoice, CreditCardPurchase,
   CreditCardSummary, DashboardSummary, EvolutionPoint, Expense, ExpenseSummary,
   Income, IncomeSummary, MonthlyOverview, Projection, ProjectionAnalysis, Transaction,
   CreateIncomeRequest, CreateExpenseRequest, CreateCreditCardRequest, CreatePurchaseRequest
@@ -50,9 +50,16 @@ export const financialService = {
   updateCreditCard: (id: string, data: CreateCreditCardRequest) =>
     apiClient.put(`/api/financial/creditcard/${id}`, data),
   deleteCreditCard: (id: string) => apiClient.delete(`/api/financial/creditcard/${id}`),
-  markCardAsPaid: (id: string) => apiClient.put(`/api/financial/creditcard/${id}/pay`),
   getCardSummary: (month: string) =>
     apiClient.get<CreditCardSummary>(`/api/financial/creditcard/summary/${month}`).then(r => r.data),
+
+  // Invoices
+  getInvoice: (cardId: string, month: string) =>
+    apiClient.get<CreditCardInvoice>(`/api/financial/creditcard/${cardId}/invoices/${month}`).then(r => r.data),
+  payInvoice: (cardId: string, month: string) =>
+    apiClient.post(`/api/financial/creditcard/${cardId}/invoices/${month}/pay`),
+  unpayInvoice: (cardId: string, month: string) =>
+    apiClient.delete(`/api/financial/creditcard/${cardId}/invoices/${month}/pay`),
 
   // Purchases
   getPurchases: (cardId: string) =>

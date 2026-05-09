@@ -37,15 +37,17 @@ public interface IFinancialService
     Task<CreditCardDto> CreateCreditCardAsync(Guid userId, CreateCreditCardDto dto, CancellationToken ct = default);
     Task<IEnumerable<CreditCardDto>> GetCreditCardsAsync(Guid userId, CancellationToken ct = default);
     Task<CreditCardDto> GetCreditCardAsync(Guid userId, Guid cardId, CancellationToken ct = default);
-    Task<IEnumerable<CreditCardDto>> GetCreditCardsByMonthAsync(Guid userId, string month, CancellationToken ct = default);
     Task UpdateCreditCardAsync(Guid userId, Guid cardId, UpdateCreditCardDto dto, CancellationToken ct = default);
-    Task MarkCreditCardAsPaidAsync(Guid userId, Guid cardId, CancellationToken ct = default);
     Task DeleteCreditCardAsync(Guid userId, Guid cardId, CancellationToken ct = default);
+
+    // Credit Card Invoices
+    Task<CreditCardInvoiceDto> GetInvoiceAsync(Guid userId, Guid cardId, string month, CancellationToken ct = default);
+    Task MarkInvoiceAsPaidAsync(Guid userId, Guid cardId, string month, CancellationToken ct = default);
+    Task MarkInvoiceAsUnpaidAsync(Guid userId, Guid cardId, string month, CancellationToken ct = default);
 
     // Credit Card Purchases
     Task<CreditCardPurchaseDto> CreatePurchaseAsync(Guid userId, Guid cardId, CreatePurchaseDto dto, CancellationToken ct = default);
     Task<IEnumerable<CreditCardPurchaseDto>> GetPurchasesAsync(Guid userId, Guid cardId, CancellationToken ct = default);
-    Task<IEnumerable<CreditCardPurchaseDto>> GetPurchasesByMonthAsync(Guid userId, Guid cardId, string month, CancellationToken ct = default);
     Task UpdatePurchaseAsync(Guid userId, Guid purchaseId, UpdatePurchaseDto dto, CancellationToken ct = default);
     Task DeletePurchaseAsync(Guid userId, Guid purchaseId, CancellationToken ct = default);
     Task<CreditCardSummaryDto> GetCreditCardSummaryAsync(Guid userId, string month, CancellationToken ct = default);

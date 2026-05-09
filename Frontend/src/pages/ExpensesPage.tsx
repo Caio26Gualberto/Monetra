@@ -3,7 +3,7 @@ import { Plus, Pencil, Trash2, TrendingDown } from 'lucide-react';
 import { Header, PageTitle } from '@/components/layout/Header';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Select } from '@/components/ui/Select';
+import { CustomSelect } from '@/components/ui/CustomSelect';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
@@ -90,17 +90,29 @@ export function ExpensesPage() {
       <PageTitle title="Despesas" subtitle={formatMonth(month)} action={action} />
 
       <div className="flex flex-wrap gap-3 mb-4">
-        <Select value={month} onChange={(e) => setMonth(e.target.value)} className="w-44">
-          {monthOptions(12).map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </Select>
-        <Select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value as 'All' | ExpenseCategory)} className="w-44">
-          <option value="All">Todas categorias</option>
-          {expenseCategoryList.map(c => <option key={c} value={c}>{expenseCategoryLabels[c]}</option>)}
-        </Select>
-        <Select value={filterMethod} onChange={(e) => setFilterMethod(e.target.value as 'All' | PaymentMethod)} className="w-44">
-          <option value="All">Todos métodos</option>
-          {paymentMethodList.map(m => <option key={m} value={m}>{paymentMethodLabels[m]}</option>)}
-        </Select>
+        <div className="w-44">
+          <CustomSelect value={month} onChange={setMonth} options={monthOptions(12)} />
+        </div>
+        <div className="w-44">
+          <CustomSelect
+            value={filterCategory}
+            onChange={(v) => setFilterCategory(v as 'All' | ExpenseCategory)}
+            options={[
+              { value: 'All', label: 'Todas categorias' },
+              ...expenseCategoryList.map(c => ({ value: c, label: expenseCategoryLabels[c] }))
+            ]}
+          />
+        </div>
+        <div className="w-44">
+          <CustomSelect
+            value={filterMethod}
+            onChange={(v) => setFilterMethod(v as 'All' | PaymentMethod)}
+            options={[
+              { value: 'All', label: 'Todos métodos' },
+              ...paymentMethodList.map(m => ({ value: m, label: paymentMethodLabels[m] }))
+            ]}
+          />
+        </div>
       </div>
 
       {summary && (

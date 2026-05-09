@@ -29,6 +29,8 @@ public class MappingProfile : Profile
 
         CreateMap<Domain.Entities.CreditCardPurchase, CreditCardPurchaseDto>()
             .ForCtorParam(nameof(CreditCardPurchaseDto.InstallmentValue),
-                o => o.MapFrom(s => s.GetInstallmentValue()));
+                o => o.MapFrom(s => s.GetInstallmentValue()))
+            .ForCtorParam(nameof(CreditCardPurchaseDto.FirstInvoiceMonth),
+                o => o.MapFrom<string>(s => string.Empty));
     }
 }

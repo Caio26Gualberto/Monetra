@@ -104,17 +104,14 @@ export interface ExpenseSummary {
 export interface CreditCard {
   id: string;
   cardName: string;
-  totalAmount: number;
-  dueDate: string;
-  month: string;
-  isPaid: boolean;
+  closingDay: number;
+  dueDay: number;
 }
 
 export interface CreateCreditCardRequest {
   cardName: string;
-  totalAmount: number;
-  dueDate: string;
-  month: string;
+  closingDay: number;
+  dueDay: number;
 }
 
 export interface CreditCardPurchase {
@@ -126,13 +123,34 @@ export interface CreditCardPurchase {
   currentInstallment: number;
   installmentValue: number;
   purchaseDate: string;
+  firstInvoiceMonth: string;
 }
 
 export interface CreatePurchaseRequest {
   description: string;
   amount: number;
   totalInstallments: number;
+  currentInstallment: number;
   purchaseDate: string;
+}
+
+export interface InvoiceLine {
+  purchaseId: string;
+  description: string;
+  installmentNumber: number;
+  totalInstallments: number;
+  installmentValue: number;
+  purchaseDate: string;
+}
+
+export interface CreditCardInvoice {
+  creditCardId: string;
+  cardName: string;
+  month: string;
+  dueDate: string;
+  totalAmount: number;
+  isPaid: boolean;
+  lines: InvoiceLine[];
 }
 
 export interface CreditCardSummary {

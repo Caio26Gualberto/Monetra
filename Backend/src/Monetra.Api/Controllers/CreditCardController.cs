@@ -22,10 +22,6 @@ public class CreditCardController : ControllerBase
     public async Task<IActionResult> Get(Guid id, CancellationToken ct)
         => Ok(await _svc.GetCreditCardAsync(User.GetUserId(), id, ct));
 
-    [HttpGet("month/{month}")]
-    public async Task<IActionResult> GetByMonth(string month, CancellationToken ct)
-        => Ok(await _svc.GetCreditCardsByMonthAsync(User.GetUserId(), month, ct));
-
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateCreditCardDto dto, CancellationToken ct)
         => Ok(await _svc.CreateCreditCardAsync(User.GetUserId(), dto, ct));
@@ -37,13 +33,6 @@ public class CreditCardController : ControllerBase
         return NoContent();
     }
 
-    [HttpPut("{id:guid}/pay")]
-    public async Task<IActionResult> MarkAsPaid(Guid id, CancellationToken ct)
-    {
-        await _svc.MarkCreditCardAsPaidAsync(User.GetUserId(), id, ct);
-        return NoContent();
-    }
-
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
@@ -51,14 +40,29 @@ public class CreditCardController : ControllerBase
         return NoContent();
     }
 
+    // Invoices
+    [HttpGet("{id:guid}/invoices/{month}")]
+    public async Task<IActionResult> GetInvoice(Guid id, string month, CancellationToken ct)
+        => Ok(await _svc.GetInvoiceAsync(User.GetUserId(), id, month, ct));
+
+    [HttpPost("{id:guid}/invoices/{month}/pay")]
+    public async Task<IActionResult> PayInvoice(Guid id, string month, CancellationToken ct)
+    {
+        await _svc.MarkInvoiceAsPaidAsync(User.GetUserId(), id, month, ct);
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}/invoices/{month}/pay")]
+    public async Task<IActionResult> UnpayInvoice(Guid id, string month, CancellationToken ct)
+    {
+        await _svc.MarkInvoiceAsUnpaidAsync(User.GetUserId(), id, month, ct);
+        return NoContent();
+    }
+
     // Purchases
     [HttpGet("{id:guid}/purchases")]
     public async Task<IActionResult> GetPurchases(Guid id, CancellationToken ct)
         => Ok(await _svc.GetPurchasesAsync(User.GetUserId(), id, ct));
-
-    [HttpGet("{id:guid}/purchases/month/{month}")]
-    public async Task<IActionResult> GetPurchasesByMonth(Guid id, string month, CancellationToken ct)
-        => Ok(await _svc.GetPurchasesByMonthAsync(User.GetUserId(), id, month, ct));
 
     [HttpPost("{id:guid}/purchases")]
     public async Task<IActionResult> CreatePurchase(Guid id, [FromBody] CreatePurchaseDto dto, CancellationToken ct)

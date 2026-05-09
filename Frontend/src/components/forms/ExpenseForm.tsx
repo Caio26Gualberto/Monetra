@@ -1,12 +1,13 @@
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useMemo } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { Select } from '@/components/ui/Select';
+import { CustomSelect } from '@/components/ui/CustomSelect';
+import { CurrencyInput } from '@/components/ui/CurrencyInput';
 import { expenseCategoryLabels, expenseCategoryList, paymentMethodLabels, paymentMethodList } from '@/lib/constants';
 import type { CreateExpenseRequest, Expense, ExpenseCategory, PaymentMethod } from '@/lib/types';
 
@@ -27,7 +28,7 @@ interface Props {
 }
 
 export function ExpenseForm({ initial, onSubmit, onCancel, submitting }: Props) {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({
+  const { register, handleSubmit, reset, control, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       category: (initial?.category as ExpenseCategory) ?? 'Food',
@@ -37,6 +38,15 @@ export function ExpenseForm({ initial, onSubmit, onCancel, submitting }: Props) 
       transactionDate: initial?.transactionDate?.slice(0, 10) ?? new Date().toISOString().slice(0, 10)
     }
   });
+
+  const categoryOptions = useMemo(
+    () => expenseCategoryList.map(c => ({ value: c, label: expenseCategoryLabels[c] })),
+    []
+  );
+  const methodOptions = useMemo(
+    () => paymentMethodList.map(m => ({ value: m, label: paymentMethodLabels[m] })),
+    []
+  );
 
   useEffect(() => {
     if (initial) {
@@ -55,20 +65,48 @@ export function ExpenseForm({ initial, onSubmit, onCancel, submitting }: Props) 
       <div className="grid grid-cols-2 gap-3">
         <div>
           <Label>Categoria</Label>
-          <Select className="mt-1" {...register('category')}>
-            {expenseCategoryList.map(c => <option key={c} value={c}>{expenseCategoryLabels[c]}</option>)}
-          </Select>
+          <div className="mt-1">
+            <Controller
+              control={control}
+              name="category"
+              render={({ field }) => (
+                <CustomSelect
+                  options={categoryOptions}
+                  value={field.value}
+                  onChange={(v) => field.onChange(v as ExpenseCategory)}
+                />
+              )}
+            />
+          </div>
         </div>
         <div>
           <Label>Método</Label>
-          <Select className="mt-1" {...register('paymentMethod')}>
-            {paymentMethodList.map(m => <option key={m} value={m}>{paymentMethodLabels[m]}</option>)}
-          </Select>
+          <div className="mt-1">
+            <Controller
+              control={control}
+              name="paymentMethod"
+              render={({ field }) => (
+                <CustomSelect
+                  options={methodOptions}
+                  value={field.value}
+                  onChange={(v) => field.onChange(v as PaymentMethod)}
+                />
+              )}
+            />
+          </div>
         </div>
       </div>
       <div>
         <Label>Valor (R$)</Label>
-        <Input type="number" step="0.01" min="0" className="mt-1" {...register('amount')} />
+        <div className="mt-1">
+          <Controller
+            control={control}
+            name="amount"
+            render={({ field }) => (
+              <CurrencyInput value={field.value} onChange={field.onChange} />
+            )}
+          />
+        </div>
         {errors.amount && <span className="text-xs text-rose-600">{errors.amount.message}</span>}
       </div>
       <div>
