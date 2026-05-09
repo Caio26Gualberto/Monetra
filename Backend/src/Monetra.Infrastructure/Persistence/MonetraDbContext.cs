@@ -90,6 +90,7 @@ public class MonetraDbContext : DbContext
             e.HasIndex(x => x.PurchaseDate);
             e.Property(x => x.Description).IsRequired().HasMaxLength(255);
             e.Property(x => x.Amount).HasColumnType("decimal(18,2)");
+            e.Property(x => x.InstallmentScheduleStartMonth).IsRequired().HasMaxLength(7);
             e.HasOne<CreditCard>().WithMany().HasForeignKey(x => x.CreditCardId).OnDelete(DeleteBehavior.Cascade);
         });
 

@@ -5,29 +5,37 @@ namespace Monetra.Domain.Services;
 public static class InvoiceMonthCalculator
 {
     /// <summary>
-    /// Returns the yyyy-MM month of the first invoice a purchase will land on,
-    /// based on purchase date and the card's closing day.
-    /// If purchaseDate.Day &lt;= closingDay the invoice closes in the same month; otherwise in the next month.
+    /// Returns the yyyy-MM month of the first invoice a purchase would land on if it were
+    /// installment 1 of 1, based on purchase date and the card's closing day.
+    /// Purchases on the closing day itself fall into the next month's invoice.
     /// </summary>
     public static string FirstInvoiceMonth(DateTime purchaseDate, int closingDay)
     {
         var effectiveClosing = Math.Min(closingDay, DateTime.DaysInMonth(purchaseDate.Year, purchaseDate.Month));
-        var baseDate = purchaseDate.Day <= effectiveClosing
+        var baseDate = purchaseDate.Day < effectiveClosing
             ? new DateTime(purchaseDate.Year, purchaseDate.Month, 1)
             : new DateTime(purchaseDate.Year, purchaseDate.Month, 1).AddMonths(1);
         return baseDate.ToString("yyyy-MM", CultureInfo.InvariantCulture);
     }
 
     /// <summary>
-    /// Returns the yyyy-MM month for a specific installment number of a purchase.
-    /// Parcels before CurrentInstallment are considered already paid elsewhere and do NOT appear.
+    /// Returns the yyyy-MM month of the currently-open invoice for a card given today's date.
     /// </summary>
-    public static string InvoiceMonthForInstallment(DateTime purchaseDate, int closingDay, int currentInstallment, int installmentNumber)
-    {
-        var first = ParseMonth(FirstInvoiceMonth(purchaseDate, closingDay));
-        var offset = installmentNumber - currentInstallment;
-        return first.AddMonths(offset).ToString("yyyy-MM", CultureInfo.InvariantCulture);
-    }
+    public static string OpenInvoiceMonth(int closingDay, DateTime today) =>
+        FirstInvoiceMonth(today, closingDay);
+
+    /// <summary>
+    /// Computes the yyyy-MM month where installment #1 of a purchase schedule lands, given that
+    /// installment <paramref name="currentInstallment"/> is anchored at <paramref name="anchorMonth"/>.
+    /// </summary>
+    public static string ScheduleStartMonth(string anchorMonth, int currentInstallment) =>
+        AddMonths(anchorMonth, -(currentInstallment - 1));
+
+    /// <summary>
+    /// Returns the yyyy-MM month for a specific installment number, given the schedule's start month.
+    /// </summary>
+    public static string InvoiceMonthForInstallment(string scheduleStartMonth, int installmentNumber) =>
+        AddMonths(scheduleStartMonth, installmentNumber - 1);
 
     /// <summary>
     /// Returns the due date for a given invoice month, clamped to the last day of the month if needed.
@@ -37,6 +45,12 @@ public static class InvoiceMonthCalculator
         var baseDate = ParseMonth(month);
         var day = Math.Min(dueDay, DateTime.DaysInMonth(baseDate.Year, baseDate.Month));
         return new DateTime(baseDate.Year, baseDate.Month, day, 0, 0, 0, DateTimeKind.Utc);
+    }
+
+    public static string AddMonths(string month, int offset)
+    {
+        var d = ParseMonth(month).AddMonths(offset);
+        return d.ToString("yyyy-MM", CultureInfo.InvariantCulture);
     }
 
     private static DateTime ParseMonth(string month) =>

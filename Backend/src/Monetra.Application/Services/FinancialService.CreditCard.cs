@@ -45,7 +45,7 @@ public partial class FinancialService
     {
         var card = await EnsureCardOwnedAsync(userId, cardId, ct);
         var purchases = (await _purchases.GetByCreditCardIdAsync(cardId, ct)).ToList();
-        var lines = BuildInvoiceLines(purchases, card.ClosingDay, month).ToList();
+        var lines = BuildInvoiceLines(purchases, month).ToList();
         var payment = await _invoicePayments.GetAsync(cardId, month, ct);
         return new CreditCardInvoiceDto(
             card.Id,
@@ -77,16 +77,18 @@ public partial class FinancialService
     public async Task<CreditCardPurchaseDto> CreatePurchaseAsync(Guid userId, Guid cardId, CreatePurchaseDto dto, CancellationToken ct = default)
     {
         var card = await EnsureCardOwnedAsync(userId, cardId, ct);
-        var purchase = new CreditCardPurchase(cardId, dto.Description, dto.Amount, dto.TotalInstallments, dto.CurrentInstallment, dto.PurchaseDate);
+        var startMonth = ComputeScheduleStartMonth(card.ClosingDay, dto.CurrentInstallment);
+        var purchase = new CreditCardPurchase(cardId, dto.Description, dto.Amount, dto.TotalInstallments, dto.CurrentInstallment, dto.PurchaseDate, startMonth);
         await _purchases.AddAsync(purchase, ct);
-        return ToPurchaseDto(purchase, card.ClosingDay);
+        return ToPurchaseDto(purchase);
     }
 
     public async Task<IEnumerable<CreditCardPurchaseDto>> GetPurchasesAsync(Guid userId, Guid cardId, CancellationToken ct = default)
     {
         var card = await EnsureCardOwnedAsync(userId, cardId, ct);
+        _ = card;
         var list = await _purchases.GetByCreditCardIdAsync(cardId, ct);
-        return list.Select(p => ToPurchaseDto(p, card.ClosingDay));
+        return list.Select(p => ToPurchaseDto(p));
     }
 
     public async Task UpdatePurchaseAsync(Guid userId, Guid purchaseId, UpdatePurchaseDto dto, CancellationToken ct = default)
@@ -94,8 +96,8 @@ public partial class FinancialService
         var purchase = await _purchases.GetByIdAsync(purchaseId, ct)
                        ?? throw new NotFoundException("Purchase not found.");
         var card = await EnsureCardOwnedAsync(userId, purchase.CreditCardId, ct);
-        _ = card;
-        purchase.Update(dto.Description, dto.Amount, dto.TotalInstallments, dto.CurrentInstallment, dto.PurchaseDate);
+        var startMonth = ComputeScheduleStartMonth(card.ClosingDay, dto.CurrentInstallment);
+        purchase.Update(dto.Description, dto.Amount, dto.TotalInstallments, dto.CurrentInstallment, dto.PurchaseDate, startMonth);
         await _purchases.UpdateAsync(purchase, ct);
     }
 
@@ -117,7 +119,7 @@ public partial class FinancialService
         foreach (var card in cards)
         {
             var cardPurchases = allPurchases.Where(p => p.CreditCardId == card.Id);
-            var lines = BuildInvoiceLines(cardPurchases, card.ClosingDay, month).ToList();
+            var lines = BuildInvoiceLines(cardPurchases, month).ToList();
             var sum = lines.Sum(l => l.InstallmentValue);
             monthTotal += sum;
             if (sum > 0) cardsWithInvoice++;
@@ -138,8 +140,7 @@ public partial class FinancialService
     public async Task<IEnumerable<CreditCardPurchaseDto>> GetPendingInstallmentsAsync(Guid userId, CancellationToken ct = default)
     {
         var list = (await _purchases.GetPendingInstallmentsByUserAsync(userId, ct)).ToList();
-        var cards = (await _cards.GetByUserIdAsync(userId, ct)).ToDictionary(c => c.Id);
-        return list.Select(p => ToPurchaseDto(p, cards.TryGetValue(p.CreditCardId, out var c) ? c.ClosingDay : 1));
+        return list.Select(p => ToPurchaseDto(p));
     }
 
     // ===================== HELPERS =====================
@@ -151,8 +152,9 @@ public partial class FinancialService
         return card;
     }
 
-    internal static CreditCardPurchaseDto ToPurchaseDto(CreditCardPurchase p, int closingDay)
+    internal static CreditCardPurchaseDto ToPurchaseDto(CreditCardPurchase p)
     {
+        var firstRemainingInvoice = InvoiceMonthCalculator.InvoiceMonthForInstallment(p.InstallmentScheduleStartMonth, p.CurrentInstallment);
         return new CreditCardPurchaseDto(
             p.Id,
             p.CreditCardId,
@@ -162,21 +164,25 @@ public partial class FinancialService
             p.CurrentInstallment,
             p.GetInstallmentValue(),
             p.PurchaseDate,
-            InvoiceMonthCalculator.FirstInvoiceMonth(p.PurchaseDate, closingDay)
+            firstRemainingInvoice
         );
     }
 
+    internal static string ComputeScheduleStartMonth(int closingDay, int currentInstallment) =>
+        InvoiceMonthCalculator.ScheduleStartMonth(
+            InvoiceMonthCalculator.OpenInvoiceMonth(closingDay, DateTime.UtcNow),
+            currentInstallment);
+
     /// <summary>
-    /// Yields invoice lines for a given month/card considering installments schedule.
-    /// The second parameter is unused but kept to avoid captures; pass-through.
+    /// Yields invoice lines for a given month considering each purchase's stored installment schedule.
     /// </summary>
-    internal static IEnumerable<InvoiceLineDto> BuildInvoiceLines(IEnumerable<CreditCardPurchase> purchases, int closingDay, string month)
+    internal static IEnumerable<InvoiceLineDto> BuildInvoiceLines(IEnumerable<CreditCardPurchase> purchases, string month)
     {
         foreach (var p in purchases)
         {
             for (var n = p.CurrentInstallment; n <= p.TotalInstallments; n++)
             {
-                var installmentMonth = InvoiceMonthCalculator.InvoiceMonthForInstallment(p.PurchaseDate, closingDay, p.CurrentInstallment, n);
+                var installmentMonth = InvoiceMonthCalculator.InvoiceMonthForInstallment(p.InstallmentScheduleStartMonth, n);
                 if (installmentMonth == month)
                 {
                     yield return new InvoiceLineDto(

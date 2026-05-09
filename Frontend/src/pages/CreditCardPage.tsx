@@ -191,17 +191,10 @@ export function CreditCardPage() {
   const installmentValue = (watchedAmount || 0) / Math.max(1, watchedTotal || 1);
 
   const previewFirstInvoice = useMemo(() => {
-    if (!selectedCard || !watchedDate) return '';
-    const d = new Date(watchedDate);
-    if (isNaN(d.getTime())) return '';
-    const closing = selectedCard.closingDay;
-    const closesThisMonth = d.getDate() <= closing;
-    const baseYear = d.getFullYear();
-    const baseMonth = d.getMonth() + (closesThisMonth ? 0 : 1);
-    const normalized = new Date(baseYear, baseMonth, 1);
-    const yyyymm = `${normalized.getFullYear()}-${String(normalized.getMonth() + 1).padStart(2, '0')}`;
+    if (!selectedCard) return '';
+    const yyyymm = openInvoiceMonth(selectedCard.closingDay);
     return formatMonth(yyyymm);
-  }, [selectedCard, watchedDate]);
+  }, [selectedCard]);
 
   const totalInstallmentOptions = useMemo(
     () => Array.from({ length: 24 }, (_, i) => ({ value: String(i + 1), label: `${i + 1}x` })),
@@ -540,8 +533,10 @@ export function CreditCardPage() {
               {previewFirstInvoice && (
                 <>
                   <br />
-                  Primeira fatura considerada: <strong className="text-foreground">{previewFirstInvoice}</strong>
-                  {watchedCurrent > 1 && <> (parcela {watchedCurrent}/{watchedTotal})</>}
+                  Parcela <strong className="text-foreground">{watchedCurrent}/{watchedTotal}</strong> cai em: <strong className="text-foreground">{previewFirstInvoice}</strong>
+                  {watchedCurrent < watchedTotal && (
+                    <> (próximas avançam mês a mês)</>
+                  )}
                 </>
               )}
             </div>
