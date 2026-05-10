@@ -69,7 +69,7 @@ public interface IFinancialService
 
     // Dashboard
     Task<DashboardSummaryDto> GetDashboardSummaryAsync(Guid userId, string? month, CancellationToken ct = default);
-    Task<IEnumerable<EvolutionPointDto>> GetEvolutionAsync(Guid userId, int months, CancellationToken ct = default);
+    Task<IEnumerable<EvolutionPointDto>> GetEvolutionAsync(Guid userId, int months, string? baseMonth = null, CancellationToken ct = default);
     Task<IEnumerable<CategoryDistributionDto>> GetDistributionAsync(Guid userId, string month, CancellationToken ct = default);
     Task<IEnumerable<TransactionDto>> GetRecentTransactionsAsync(Guid userId, CancellationToken ct = default);
 

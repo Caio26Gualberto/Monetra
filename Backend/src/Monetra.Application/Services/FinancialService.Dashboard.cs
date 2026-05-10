@@ -68,18 +68,46 @@ public partial class FinancialService
         );
     }
 
-    public async Task<IEnumerable<EvolutionPointDto>> GetEvolutionAsync(Guid userId, int months, CancellationToken ct = default)
+    public async Task<IEnumerable<EvolutionPointDto>> GetEvolutionAsync(Guid userId, int months, string? baseMonth = null, CancellationToken ct = default)
     {
         if (months < 1) months = 6;
         var result = new List<EvolutionPointDto>();
-        var now = DateTime.UtcNow;
-        for (int i = months - 1; i >= 0; i--)
+        var todayMonth = CurrentMonth();
+        var targetMonth = string.IsNullOrWhiteSpace(baseMonth) ? todayMonth : baseMonth;
+        
+        // Calcula o range: (months - 1) meses atrás até o mês alvo
+        var dataPoints = new List<(string month, decimal inc, decimal exp)>();
+        for (int i = -(months - 1); i <= 0; i++)
         {
-            var m = now.AddMonths(-i).ToString("yyyy-MM");
+            var m = InvoiceMonthCalculator.AddMonths(targetMonth, i);
             var inc = await ComputeMonthlyIncomeAsync(userId, m, ct);
             var exp = await ComputeMonthlyExpenseAsync(userId, m, ct);
-            result.Add(new EvolutionPointDto(m, inc, exp));
+            dataPoints.Add((m, inc, exp));
         }
+        
+        // Aplica extrapolação para meses futuros
+        var lastInc = 0m;
+        var lastExp = 0m;
+        
+        foreach (var point in dataPoints)
+        {
+            var inc = point.inc;
+            var exp = point.exp;
+            
+            // Se for mês futuro sem entradas, extrapola usando o último fluxo conhecido
+            if (string.CompareOrdinal(point.month, todayMonth) > 0)
+            {
+                if (inc == 0m && lastInc > 0m) inc = lastInc;
+                if (exp == 0m && lastExp > 0m) exp = lastExp;
+            }
+            
+            // Atualiza o último fluxo conhecido
+            if (inc > 0m) lastInc = inc;
+            if (exp > 0m) lastExp = exp;
+            
+            result.Add(new EvolutionPointDto(point.month, inc, exp));
+        }
+        
         return result;
     }
 

@@ -102,8 +102,8 @@ export const financialService = {
   // Dashboard
   getDashboard: (month?: string) =>
     apiClient.get<DashboardSummary>('/api/financial/dashboard/summary', { params: { month } }).then(r => r.data),
-  getEvolution: (months: number) =>
-    apiClient.get<EvolutionPoint[]>(`/api/financial/dashboard/evolution/${months}`).then(r => r.data),
+  getEvolution: (months: number, baseMonth?: string) =>
+    apiClient.get<EvolutionPoint[]>(`/api/financial/dashboard/evolution/${months}`, { params: { baseMonth } }).then(r => r.data),
   getDistribution: (month: string) =>
     apiClient.get<CategoryDistribution[]>(`/api/financial/dashboard/distribution/${month}`).then(r => r.data),
   getRecentTransactions: () =>

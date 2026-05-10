@@ -79,7 +79,7 @@ export function FixedIncomesPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <StatCard title="Total Mensal" value={monthlyTotal} icon={Repeat} gradient="purple" subtitle="Soma das fixas ativas" />
-        <StatCard title="Quantidade" value={items.length} icon={Repeat} subtitle={items.length === 1 ? 'receita fixa' : 'receitas fixas'} />
+        <StatCard title="Quantidade" useBrl={false} value={items.length} icon={Repeat} subtitle={items.length === 1 ? 'receita fixa' : 'receitas fixas'} />
       </div>
 
       <Card>

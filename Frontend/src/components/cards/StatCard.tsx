@@ -11,9 +11,10 @@ interface Props {
   comparisonInverted?: boolean;
   gradient?: 'purple' | 'pink' | 'mix' | 'plain';
   subtitle?: string;
+  useBrl?: boolean;
 }
 
-export function StatCard({ title, value, icon: Icon, comparison, comparisonInverted, gradient = 'plain', subtitle }: Props) {
+export function StatCard({ title, value, icon: Icon, comparison, comparisonInverted, gradient = 'plain', subtitle, useBrl = true }: Props) {
   const gradClass = {
     purple: 'gradient-purple text-white',
     pink: 'gradient-pink text-white',
@@ -30,7 +31,7 @@ export function StatCard({ title, value, icon: Icon, comparison, comparisonInver
         <div className="min-w-0">
           <div className={cn('text-xs font-medium', isWhite ? 'text-white/85' : 'text-muted-foreground')}>{title}</div>
           <div className={cn('text-2xl font-bold mt-1', isWhite ? 'text-white' : 'text-foreground')}>
-            {brl(value)}
+            {useBrl ? brl(value) : value}
           </div>
           {subtitle && (
             <div className={cn('text-[11px] mt-1', isWhite ? 'text-white/80' : 'text-muted-foreground')}>{subtitle}</div>

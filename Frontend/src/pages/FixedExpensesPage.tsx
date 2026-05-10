@@ -79,7 +79,7 @@ export function FixedExpensesPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <StatCard title="Total Mensal" value={monthlyTotal} icon={Repeat} gradient="pink" subtitle="Soma de todas as fixas ativas" />
-        <StatCard title="Quantidade" value={items.length} icon={Repeat} subtitle={items.length === 1 ? 'despesa fixa' : 'despesas fixas'} />
+        <StatCard title="Quantidade" useBrl={false} value={items.length} icon={Repeat} subtitle={items.length === 1 ? 'despesa fixa' : 'despesas fixas'} />
       </div>
 
       <Card>

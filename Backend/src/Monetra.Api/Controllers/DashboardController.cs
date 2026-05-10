@@ -22,8 +22,8 @@ public class DashboardController : ControllerBase
         => Ok(await _svc.GetDashboardSummaryAsync(User.GetUserId(), month, ct));
 
     [HttpGet("evolution/{months:int}")]
-    public async Task<IActionResult> Evolution(int months, CancellationToken ct)
-        => Ok(await _svc.GetEvolutionAsync(User.GetUserId(), months, ct));
+    public async Task<IActionResult> Evolution(int months, [FromQuery] string? baseMonth, CancellationToken ct)
+        => Ok(await _svc.GetEvolutionAsync(User.GetUserId(), months, baseMonth, ct));
 
     [HttpGet("distribution/{month}")]
     public async Task<IActionResult> Distribution(string month, CancellationToken ct)

@@ -30,7 +30,7 @@ export function DashboardPage() {
     setLoading(true);
     Promise.all([
       financialService.getDashboard(month),
-      financialService.getEvolution(6),
+      financialService.getEvolution(6, month),
       financialService.getDistribution(month)
     ])
       .then(([s, e, d]) => {

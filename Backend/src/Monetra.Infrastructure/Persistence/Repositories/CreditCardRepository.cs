@@ -18,14 +18,14 @@ public class CreditCardPurchaseRepository : Repository<CreditCardPurchase>, ICre
 
     public async Task<IEnumerable<CreditCardPurchase>> GetByCreditCardIdAsync(Guid creditCardId, CancellationToken ct = default)
         => await Db.CreditCardPurchases.Where(p => p.CreditCardId == creditCardId)
-            .OrderByDescending(p => p.PurchaseDate).ToListAsync(ct);
+            .OrderByDescending(p => p.CreatedAt).ToListAsync(ct);
 
     public async Task<IEnumerable<CreditCardPurchase>> GetByUserIdAsync(Guid userId, CancellationToken ct = default)
     {
         var query = from p in Db.CreditCardPurchases
                     join c in Db.CreditCards on p.CreditCardId equals c.Id
                     where c.UserId == userId
-                    orderby p.PurchaseDate descending
+                    orderby p.CreatedAt descending
                     select p;
         return await query.ToListAsync(ct);
     }
@@ -35,7 +35,7 @@ public class CreditCardPurchaseRepository : Repository<CreditCardPurchase>, ICre
         var query = from p in Db.CreditCardPurchases
                     join c in Db.CreditCards on p.CreditCardId equals c.Id
                     where c.UserId == userId && p.CurrentInstallment <= p.TotalInstallments
-                    orderby p.PurchaseDate descending
+                    orderby p.CreatedAt descending
                     select p;
         return await query.ToListAsync(ct);
     }
